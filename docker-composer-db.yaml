@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: pg-ms-spring
+    environment:
+      POSTGRES_DB: ms_spring_dev
+      POSTGRES_USER: spring_dev
+      POSTGRES_PASSWORD: spring_dev
+    ports:
+      - "54321:5432"
+    volumes:
+      - pg_ms_spring_data:/var/lib/postgresql/data
+      - ./infra/data/schema-pessoa.sql:/docker-entrypoint-initdb.d/schema-pessoa.sql:ro
+    networks:
+      - ms-spring-network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-ms-spring
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - ./infra/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      - postgres
+    networks:
+      - ms-spring-network
+    restart: unless-stopped
+
+volumes:
+  pg_ms_spring_data:
+
+networks:
+  ms-spring-network:
+    driver: bridge

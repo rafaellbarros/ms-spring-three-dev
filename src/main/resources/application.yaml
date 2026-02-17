@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ms-spring-three-dev
+  profiles:
+    default: local
