@@ -1,0 +1,59 @@
+# Configuração para ambiente de teste com H2 em modo PostgreSQL
+server:
+  port: 8092  # Porta diferente para testes
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # Configuração do banco H2 em modo compatibilidade PostgreSQL
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 2
+      connection-timeout: 30000
+      minimum-idle: 1
+      pool-name: H2-Test-Pool
+
+  # Configurações do JPA/Hibernate compatíveis com PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # Cria e dropa as tabelas a cada teste
+    show-sql: true
+    open-in-view: false
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        globally_quoted_identifiers: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        temp:
+          use_jdbc_metadata_defaults: false
+    defer-datasource-initialization: true
+
+  # H2 console para debug se necessário
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        trace: false
+        web-allow-others: false
+
+# Logging configurado igual ao local
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: INFO
+    org.hibernate: INFO
+    org.springframework.transaction: DEBUG
